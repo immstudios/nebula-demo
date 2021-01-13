@@ -5,7 +5,7 @@
 #
 
 nebula_branch=immstudios
-site_name=nebula-dev
+site_name=nebula
 
 #
 # Common utils
@@ -80,17 +80,19 @@ cp \
 docker-compose build \
     --build-arg USER_ID=$(id -u) \
     --build-arg GROUP_ID=$(id -g) \
-    nebula-core
+    core
 
 docker-compose build \
     --build-arg USER_ID=$(id -u) \
     --build-arg GROUP_ID=$(id -g) \
-    nebula-worker
+    worker
 
 docker-compose build \
     --build-arg USER_ID=$(id -u) \
     --build-arg GROUP_ID=$(id -g) \
-    nebula-playout
+    playout
+
+
 
 
 finished

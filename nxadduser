@@ -1,1 +1,0 @@
-docker-compose exec nebula-core ./manage.py adduser

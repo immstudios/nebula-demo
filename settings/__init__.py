@@ -29,7 +29,7 @@ services = [
 for i, row in enumerate(services):
     # All services have auto_restart enabled (True)
     # and the loop_delay parameter set to 5 seconds
-    data["services"][i] = row + [True, 5]
+    data["services"][i+1] = row + [True, 5]
 
 
 data["channels"] = {
@@ -40,7 +40,7 @@ data["channels"] = {
 
         'conti_settings' : {},
         'conti_outputs' : [{
-            "target" : "/data/output/nebula.m3u8",
+            "target" : "/data/hls/nebula.m3u8",
             "audio_filters" : "pan=stereo|c0=c0|c1=c1, loudnorm=I=-23",
             "video_filters" : "scale=640x360",
             "params" : {
@@ -52,12 +52,12 @@ data["channels"] = {
                 "b:a" : "128k",
                 "f" : "hls",
                 "hls_time" : 3.2,
-                "hls_segment_filename" : "/data/output/nebula%04d.ts",
+                "hls_segment_filename" : "/data/hls/nebula%04d.ts",
                 "hls_flags" : "+delete_segments"
             }
         }],
 
-        'controller_host' : "nebula-playout",
+        'controller_host' : "playout",
         'controller_port' : 42100,
         'day_start' : [7, 0],
         'rundown_accepts': "asset['content_type'] == VIDEO",
