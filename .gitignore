@@ -2,8 +2,9 @@ __pycache__
 
 data/database/pgdata
 data/sessions/*
-data/log/*
-data/hls/*
+data/log/*.txt
+data/hls/*.ts
+data/hls/*.m3u8
 
 *.mov
 *.mxf
