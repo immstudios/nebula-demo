@@ -5,14 +5,9 @@ data/sessions/*
 data/log/*
 data/hls/*
 
+*.mov
+*.mxf
 
-data/storage/media.dir/movies/*
-data/storage/media.dir/stories/*
-data/storage/media.dir/songs/*
-data/storage/media.dir/fill/*
-data/storage/media.dir/trailers/*
-data/storage/media.dir/jingles/*
-data/storage/media.dir/graphics/*
 
 nebula/nebula
 nebula/nebula-setup
