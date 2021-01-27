@@ -34,6 +34,7 @@ services:
 
     core:
         build: ./nebula
+        hostname: "core"
         restart: always
         volumes:
             - ./nebula/nebula:/opt/nebula
