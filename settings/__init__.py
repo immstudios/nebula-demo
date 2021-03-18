@@ -58,7 +58,7 @@ data["channels"] = {
         }],
 
         'controller_host' : "playout",
-        'controller_port' : 42100,
+        'controller_port' : 42101,
         'day_start' : [7, 0],
         'rundown_accepts': "asset['content_type'] == VIDEO",
         'scheduler_accepts': "asset['id_folder'] in [1, 2]",

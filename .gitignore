@@ -8,6 +8,8 @@ data/hls/*.m3u8
 
 *.mov
 *.mxf
+*.mp3
+*.jpg
 
 
 nebula/nebula

@@ -20,13 +20,47 @@ services:
         image: weseek/nginx-nchan
         ports:
             - "8080:80"
-        expose:
-            - "80"
         volumes:
             - ./support/nginx.conf:/etc/nginx/conf.d/default.conf:ro
             - ./data:/data
         depends_on:
             - "core"
+
+    #
+    # Metrics and logging
+    #
+
+    prometheus:
+        image: prom/prometheus:master
+        hostname: "prometheus"
+        volumes:
+            - ./support/prometheus.yml:/etc/prometheus/prometheus.yml
+        restart: unless-stopped
+        command: [
+            "--config.file=/etc/prometheus/prometheus.yml",
+            "--log.level=warn",
+            "--storage.tsdb.path=/prometheus",
+            "--storage.tsdb.retention.time=7d",
+        ]
+
+    grafana:
+        image: grafana/grafana:master
+        hostname: "grafana"
+        user: "0"
+        volumes:
+            - ./support/grafana.ini:/etc/grafana/grafana.ini:ro
+            - ./support/grafana:/etc/grafana/provisioning:ro
+        restart: unless-stopped
+
+    loki:
+        image: grafana/loki:master
+        ports:
+            - "3100:3100"
+        restart: unless-stopped
+        command: [
+            "--config.file=/etc/loki/local-config.yaml",
+            "--log.level=warn"
+        ]
 
     #
     # Nebula core runs hub (API server) and nebula-setup
