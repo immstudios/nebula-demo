@@ -1,6 +1,5 @@
 __pycache__
 
-data/database/pgdata
 data/sessions/*
 data/log/*.txt
 data/hls/*.ts
@@ -15,3 +14,4 @@ data/hls/*.m3u8
 nebula/nebula
 nebula/nebula-setup
 support/postgres-init/schema
+data/storage/.nx/proxy

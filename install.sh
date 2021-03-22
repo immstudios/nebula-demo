@@ -1,20 +1,16 @@
 #!/bin/bash
 
-#
-# Settings
-#
 
 nebula_branch=immstudios
 site_name=nebula
-
-#
-# Common utils
-#
-
 base_dir=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 
+function stage (){
+    printf "\n\033[0;34m${1}\033[0m\n\n"
+}
+
 function error_exit {
-    printf "\n\033[0;31mInstallation failed\033[0m\n"
+    printf "\n\033[0;31mInstallation failed: $1\033[0m\n"
     cd ${base_dir}
     exit 1
 }
@@ -25,9 +21,23 @@ function finished {
     exit 0
 }
 
+if ! [ -x "$(command -v git)" ]; then
+    error_exit "git is not installed"
+fi
+
+if ! [ -x "$(command -v docker-compose)" ]; then
+    error_exit "docker-compose is not installed"
+fi
+
+if ! [ -x "$(command -v pip3)" ]; then
+    error_exit "pip3 is not installed"
+fi
+
 #
 # Download nebula
 #
+
+stage "Downloading Nebula"
 
 nebula_dir=$base_dir/nebula
 nebula_repos=(
@@ -53,7 +63,9 @@ function download_repos {
     return 0
 }
 
-download_repos || error_exit
+
+download_repos || error_exit "Download failed"
+
 
 settings_path=$base_dir/nebula/nebula/settings.json
 echo "{" > $settings_path
@@ -69,30 +81,37 @@ cp $settings_path $base_dir/nebula/nebula-setup/settings.json
 # Database
 #
 
-cp \
-    $base_dir/nebula/nebula-setup/support/schema.sql \
-    $base_dir/support/postgres-init/schema
+stage "Starting database server"
 
-#
-# Default settings
-#
+docker-compose up -d postgres
 
-docker-compose build \
-    --build-arg USER_ID=$(id -u) \
-    --build-arg GROUP_ID=$(id -g) \
-    core
+# Wait for postgres
+while true; do
+    docker-compose exec postgres sh -c "PGPASSWORD=nebulapass psql -U postgres -c '\d'" > /dev/null
+    if [ $? -eq 0 ]; then
+        break
+    fi
+    echo "Waiting for PostgreSQL become active"
 
-docker-compose build \
-    --build-arg USER_ID=$(id -u) \
-    --build-arg GROUP_ID=$(id -g) \
-    worker
+done
 
-docker-compose build \
-    --build-arg USER_ID=$(id -u) \
-    --build-arg GROUP_ID=$(id -g) \
-    playout
+stage "Creating database schema"
 
+docker-compose exec -T postgres sh -c "PGPASSWORD=nebulapass psql -U postgres" <<-EOSQL
+    CREATE USER nebula WITH PASSWORD 'nebula';
+    CREATE DATABASE nebula OWNER nebula;
+EOSQL
 
+stage "Creating database schema"
 
+docker-compose exec -T postgres sh -c "PGPASSWORD=nebulapass psql -U nebula nebula" < ${base_dir}/nebula/nebula-setup/support/schema.sql
+
+stage "Applying site settings"
+
+docker-compose run -w /opt/nebula-setup --entrypoint ./setup.py core
+
+stage "Starting nebula"
+
+docker-compose up -d
 
 finished

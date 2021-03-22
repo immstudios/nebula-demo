@@ -1,6 +1,4 @@
 <service>
     <relay>http://nginx</relay>
-    <log_dir>/data/log</log_dir>
-    <log_ttl>7</log_ttl>
     <loki>loki</loki>
 </service>

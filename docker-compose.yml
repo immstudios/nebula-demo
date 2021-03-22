@@ -6,15 +6,23 @@ volumes:
 services:
     postgres:
         image: postgres
+        ports:
+            - "5432:5432"
         environment:
             - "POSTGRES_PASSWORD=nebulapass"
             - "PGDATA=/var/lib/postgresql/data/pgdata"
         volumes:
             - database:/var/lib/postgresql/data
-            - ./support/postgres-init:/docker-entrypoint-initdb.d
 
     memcached:
+        ports:
+            - "11211:11211"
         image: memcached
+
+    rabbitmq:
+        ports:
+            - "5672:5672"
+        image: rabbitmq
 
     nginx:
         image: weseek/nginx-nchan
@@ -67,7 +75,7 @@ services:
     #
 
     core:
-        build: ./nebula
+        image: nebulabroadcast/nebula-base
         hostname: "core"
         restart: always
         volumes:
@@ -78,6 +86,7 @@ services:
         depends_on:
             - postgres
             - memcached
+            - rabbitmq
         entrypoint: ./manage.py run hub
 
     #
@@ -85,7 +94,7 @@ services:
     #
 
     worker:
-        build: ./nebula
+        image: nebulabroadcast/nebula-base
         hostname: "worker"
         restart: always
         volumes:
@@ -94,6 +103,7 @@ services:
         depends_on:
             - postgres
             - memcached
+            - rabbitmq
         entrypoint: ./nebula.py
 
     #
@@ -101,7 +111,7 @@ services:
     #
 
     playout:
-        build: ./nebula
+        image: nebulabroadcast/nebula-base
         hostname: "playout"
         restart: always
         volumes:
@@ -110,4 +120,5 @@ services:
         depends_on:
             - postgres
             - memcached
+            - rabbitmq
         entrypoint: ./nebula.py
