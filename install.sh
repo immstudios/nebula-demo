@@ -37,7 +37,6 @@ fi
 # Download nebula
 #
 
-stage "Downloading Nebula"
 
 nebula_dir=$base_dir/nebula
 nebula_repos=(
@@ -45,16 +44,19 @@ nebula_repos=(
     "https://github.com/${nebula_branch}/nebula-setup"
 )
 
+stage "Downloading Nebula to $nebula_dir"
+
 function download_repos {
     for i in ${nebula_repos[@]}; do
-        cd $nebula_dir
-        repo_dir=`basename $i`
+        repo_dir=$nebula_dir/$(basename $i)
         if [ -d $repo_dir ]; then
+            echo "PWD: $nebula_dir"
             cd $repo_dir
             git checkout master || return 1
             git pull || return 1
-            cd ..
         else
+            echo "PWD: $nebula_dir"
+            cd $nebula_dir
             git clone $i || return 1
         fi
         cd $repo_dir
@@ -65,6 +67,7 @@ function download_repos {
 
 
 download_repos || error_exit "Download failed"
+
 
 
 settings_path=$base_dir/nebula/nebula/settings.json
@@ -110,8 +113,5 @@ stage "Applying site settings"
 
 docker-compose run -w /opt/nebula-setup --entrypoint ./setup.py core
 
-stage "Starting nebula"
-
-docker-compose up -d
-
+stage "Installation finished. Now run 'docker-compose up' or 'docker-compose up -d' to bring your stack to life"
 finished
