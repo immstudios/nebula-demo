@@ -65,10 +65,7 @@ function download_repos {
     return 0
 }
 
-
 download_repos || error_exit "Download failed"
-
-
 
 settings_path=$base_dir/nebula/nebula/settings.json
 echo "{" > $settings_path
@@ -79,6 +76,13 @@ echo "    \"db_pass\" : \"nebula\"," >> $settings_path
 echo "    \"db_name\" : \"nebula\"" >> $settings_path
 echo "}" >> $settings_path
 cp $settings_path $base_dir/nebula/nebula-setup/settings.json
+
+
+
+stage "Pulling the latest nebula-base image"
+
+docker pull nebulabroadcast/nebula-base:latest
+
 
 #
 # Database
@@ -94,11 +98,11 @@ while true; do
     if [ $? -eq 0 ]; then
         break
     fi
-    echo "Waiting for PostgreSQL become active"
+    echo "Waiting for PostgreSQL"
 
 done
 
-stage "Creating database schema"
+stage "Creating the database and user"
 
 docker-compose exec -T postgres sh -c "PGPASSWORD=nebulapass psql -U postgres" <<-EOSQL
     CREATE USER nebula WITH PASSWORD 'nebula';
